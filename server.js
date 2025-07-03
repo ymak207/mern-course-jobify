@@ -14,6 +14,8 @@ import jobRouter from './routes/jobRouter.js';
 import authRouter from './routes/authRouter.js';
 import userRouter from './routes/userRouter.js';
 import cloudinary from 'cloudinary';
+import helmet from 'helmet';
+import mongoSanitize from 'express-mongo-sanitize';
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -49,17 +51,12 @@ try {
   process.exit(1);
 }
 
-app.use(cookieParser());
-app.use(express.json());
 app.use(express.static(path.resolve(__dirname, './client/dist')));
 
-app.get('/', (req, res) => {
-  res.send('Hello World');
-});
-
-app.get('/api/v1/test', (req, res) => {
-  res.json({ msg: 'test route' });
-});
+app.use(cookieParser());
+app.use(express.json());
+app.use(helmet());
+app.use(mongoSanitize());
 
 app.use('/api/v1/jobs', authenticateUser, jobRouter);
 app.use('/api/v1/users', authenticateUser, userRouter);
